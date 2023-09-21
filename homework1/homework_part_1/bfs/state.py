@@ -8,6 +8,8 @@ The target is :
 '''
 import random
 import math
+
+#x is the current number puzzle state
 def get_next(x):
     ns=[]
     for i in "<>v^":
@@ -19,6 +21,9 @@ def get_next(x):
     return ns
 
 #returns a random board nXn
+# the board contains the actual puzzle in index 0, a length n^2 1D array where the empty spot is represented as a 0
+# At index 1, it contains the path, a String of moves used to bring the puzzle from its initial state to its current one
+# moves are represented by ^ for up, < for left, > for right, and v for down
 def create(n):
     s=list(range(n*n))
     m="<>v^"
@@ -26,9 +31,11 @@ def create(n):
         if_legal(s,m[random.randrange(4)])
     return [s,""]
 
+# given x, the current board state, it returns the length of the path used
 def path_len(x):
     return len(x[1])
 
+# checks if the given number puzzle is in its solution state
 def is_target(x):
     n=len(x[0])
     return x[0]==list(range(n))
@@ -37,6 +44,7 @@ def hdistance(s):
     return 0
 
 #############################
+# checks if the proposed move is legal, given x, the board state, and m, the move
 def if_legal(x,m):
     n=int(math.sqrt(len(x)))
     z=x.index(0)

@@ -20,7 +20,7 @@ def search(n):
         # So, I decided to consider average depth 25, inserts 1500000, and removes 700000
 
         if elapsed_time > 5:
-            return [[0, "abcdefghijklmnopqrstuvwxy"]], 700000, 700000, 100
+            return [[0, "abcdefghijklmnopqrstuvwxy"]], 1500000, 700000, 100
 
         if state.is_target(s):
             return [s, f[1]], f[4], f[5], elapsed_time

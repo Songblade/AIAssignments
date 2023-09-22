@@ -9,7 +9,7 @@ def run_test(side_length):
     for x in range(denominator):
         results = search.search(side_length)
 
-        total_depth += len(results[0][1])
+        total_depth += len(results[0][0][1])
         total_insert += results[1]
         total_delete += results[2]
         total_time += results[3]

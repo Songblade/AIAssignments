@@ -1,15 +1,16 @@
 import search
+import state
 
 
-def run_test(side_length):
+def run_test(side_length, heuristic):
     print("Running for a side length of " + str(side_length))
 
     total_insert, total_delete, total_depth, total_time, total_timeouts = 0, 0, 0, 0, 0
     denominator = 100  # the number of times we run the program
     for x in range(denominator):
-        results = search.search(side_length)
+        results = search.search(side_length, heuristic)
 
-        total_depth += len(results[0][0][1])
+        total_depth += len(results[0][1])
         total_insert += results[1]
         total_delete += results[2]
         total_time += results[3]
@@ -28,6 +29,14 @@ def run_test(side_length):
     print("Number of timeouts: " + str(total_timeouts) + "\n")
 
 
-run_test(2)
-run_test(3)
-run_test(4)
+run_test(2, state.hdistance)
+run_test(3, state.hdistance)
+run_test(4, state.hdistance)
+
+run_test(2, state.hdistance1)
+run_test(3, state.hdistance1)
+run_test(4, state.hdistance1)
+
+run_test(2, state.hdistance2)
+run_test(3, state.hdistance2)
+run_test(4, state.hdistance2)

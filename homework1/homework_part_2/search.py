@@ -5,7 +5,7 @@ import frontier
 import time
 
 
-def search(n, heuristic):
+def search(n, heuristic=state.hdistance):
     start_time = time.time()
     s = state.create(n)
     # print(s)
@@ -30,5 +30,5 @@ def search(n, heuristic):
     return 0
 
 
-# print(search(4, state.hdistance2))
+#  print(search(4))
 

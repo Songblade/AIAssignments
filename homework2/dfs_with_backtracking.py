@@ -1,38 +1,8 @@
 import queens_problem
 
 
-def place_in_next_row(columns, column):
-    columns.append(column)
-
-
-def remove_in_current_row(columns):
-    if len(columns) > 0:
-        return columns.pop()
-    return -1
-
-
-def next_row_is_safe(columns, column, size):
-    row = len(columns)
-    # check column
-    for queen_column in columns:
-        if column == queen_column:
-            return False
-
-    # check diagonal
-    for queen_row, queen_column in enumerate(columns):
-        if queen_column - queen_row == column - row:
-            return False
-
-    # check other diagonal
-    for queen_row, queen_column in enumerate(columns):
-        if (size - queen_column) - queen_row == (size - column) - row:
-            return False
-    return True
-
-
-def solve_queen(size, columns=None):
-    if columns is None:
-        columns = []
+def solve_queen(size):
+    columns = []
 
     number_of_moves = 0  # where do I change this so it counts the number of Queen moves?
     number_of_iterations = 0
@@ -44,11 +14,11 @@ def solve_queen(size, columns=None):
         # print(columns)
         # print("I have ", row, " number of queens put down")
         # display()
-        print(number_of_moves)
+        # print(number_of_moves)
         while column < size:
             number_of_iterations += 1
-            if next_row_is_safe(columns, column, size):
-                place_in_next_row(columns, column)
+            if queens_problem.next_row_is_safe(columns, column, size):
+                queens_problem.place_in_next_row(columns, column)
                 row += 1
                 column = 0
                 break
@@ -64,7 +34,7 @@ def solve_queen(size, columns=None):
                 # print(number_of_moves)
                 return number_of_iterations, number_of_moves
             # I couldn't find a solution so I now backtrack
-            prev_column = remove_in_current_row(columns)
+            prev_column = queens_problem.remove_in_current_row(columns)
             if prev_column == -1:  # I backtracked past column 1
                 print("There are no solutions")
                 # print(number_of_moves)

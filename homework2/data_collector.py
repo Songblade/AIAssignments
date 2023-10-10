@@ -4,6 +4,7 @@ import time
 
 
 def run_and_display_queens_algorithm(algorithm, size):
+    print()
     start_time = time.time()
     num_iterations, num_moves = algorithm(size)
     elapsed_time = time.time() - start_time

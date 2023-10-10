@@ -4,7 +4,7 @@ import queens_problem
 def solve_queen(size):
     columns = []
 
-    number_of_moves = 0  # where do I change this so it counts the number of Queen moves?
+    number_of_moves = 0
     number_of_iterations = 0
     row = 0
     column = 0
@@ -17,6 +17,8 @@ def solve_queen(size):
         # print(number_of_moves)
         while column < size:
             number_of_iterations += 1
+            number_of_moves += 1  # we placed a queen, so we count it
+            # it's possible that we immediately remove it, but if so, we still placed it
             if queens_problem.next_row_is_safe(columns, column, size):
                 queens_problem.place_in_next_row(columns, column)
                 row += 1
@@ -27,6 +29,7 @@ def solve_queen(size):
         # if I could not find an open column or if board is full
         if column == size or row == size:
             number_of_iterations += 1
+            # I'm not sure why this counts as an iteration, but I didn't add a queen, so I'm not counting it as a move
             # if board is full, we have a solution
             if row == size:
                 print("I did it! Here is my solution")
@@ -35,6 +38,8 @@ def solve_queen(size):
                 return number_of_iterations, number_of_moves
             # I couldn't find a solution so I now backtrack
             prev_column = queens_problem.remove_in_current_row(columns)
+            # I am assuming that removing a queen isn't a move, and so I am doing nothing here
+            # If that turns out not to be the case, I will change it later
             if prev_column == -1:  # I backtracked past column 1
                 print("There are no solutions")
                 # print(number_of_moves)

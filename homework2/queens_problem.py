@@ -55,7 +55,6 @@ def display(columns):
                 print(' .', end=' ')
         print()
 
-# TODO: Update DFS to count number of moves
-# TODO: Finish British Museum
 # TODO: Do Heuristic Repair/Stochastic Search
 # TODO: Do Forward Checking
+# TODO: Update DFS and British Museum if removal counts as a move

@@ -16,3 +16,5 @@ def run_and_display_queens_algorithm(algorithm, size):
 
 run_and_display_queens_algorithm(dfs_with_backtracking.solve_queen, 8)
 run_and_display_queens_algorithm(british_museum.solve_queen, 8)
+
+run_and_display_queens_algorithm(dfs_with_backtracking.solve_queen, 4)

@@ -11,10 +11,12 @@ def board_is_safe(columns):
 
 def solve_queen(size):
     num_iterations = 0
-    num_moves = 0
+    num_moves = -size  # because I am adding size each time
+    # But we don't need to remove the previous size queens on the first iteration when the board is clear.
     while True:
         num_iterations += 1
-        num_moves += 8  # since we place 8 queens at a time
+        num_moves += 2 * size  # since we are removing the previous size queens and adding size more
+        # so we are removing the previous 16 and adding the next one
         columns = queens_problem.place_n_queens(size)
         if board_is_safe(columns):
             print("I did it! Here is my solution")

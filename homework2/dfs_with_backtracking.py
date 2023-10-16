@@ -26,6 +26,7 @@ def solve_queen(size):
                 break
             else:
                 column += 1
+                number_of_moves += 1  # we removed the queen as soon as we placed it
         # if I could not find an open column or if board is full
         if column == size or row == size:
             number_of_iterations += 1
@@ -38,8 +39,7 @@ def solve_queen(size):
                 return number_of_iterations, number_of_moves
             # I couldn't find a solution so I now backtrack
             prev_column = queens_problem.remove_in_current_row(columns)
-            # I am assuming that removing a queen isn't a move, and so I am doing nothing here
-            # If that turns out not to be the case, I will change it later
+            number_of_moves += 1  # We remove the queen, so we count it as a move
             if prev_column == -1:  # I backtracked past column 1
                 print("There are no solutions")
                 # print(number_of_moves)

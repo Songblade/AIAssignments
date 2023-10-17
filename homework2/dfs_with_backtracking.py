@@ -33,8 +33,9 @@ def solve_queen(size):
             # I'm not sure why this counts as an iteration, but I didn't add a queen, so I'm not counting it as a move
             # if board is full, we have a solution
             if row == size:
-                print("I did it! Here is my solution")
-                queens_problem.display(columns)
+                # I have these commented out, so that they don't spam me when doing it 100 times
+                # print("I did it! Here is my solution")
+                # queens_problem.display(columns)
                 # print(number_of_moves)
                 return number_of_iterations, number_of_moves
             # I couldn't find a solution so I now backtrack

@@ -19,6 +19,7 @@ def solve_queen(size):
         # so we are removing the previous 16 and adding the next one
         columns = queens_problem.place_n_queens(size)
         if board_is_safe(columns):
-            print("I did it! Here is my solution")
-            queens_problem.display(columns)
+            # I have these commented out, so that they don't spam me when I do it 100 times
+            # print("I did it! Here is my solution")
+            # queens_problem.display(columns)
             return num_iterations, num_moves

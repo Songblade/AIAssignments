@@ -48,7 +48,8 @@ def taking_too_long(elapsed_time, trying_hard):
     return False
 
 
-run_and_display_queens_algorithm(dfs_with_backtracking.solve_queen, 4)
-run_and_display_queens_algorithm(hill_climbing.solve_queen, 4)
+# run_and_display_queens_algorithm(dfs_with_backtracking.solve_queen, 4)
+# run_and_display_queens_algorithm(hill_climbing.solve_queen, 40)
 # collect_data_for_queens_algorithm(dfs_with_backtracking.solve_queen, False)
 # collect_data_for_queens_algorithm(british_museum.solve_queen, False)
+collect_data_for_queens_algorithm(hill_climbing.solve_queen, False)

@@ -56,7 +56,6 @@ def solve_queen(size):
                     if plateau_count >= size:
                         # We have been plateauing for too long. It's time for a random restart
                         should_random_restart = True
-                        number_of_moves += size  # because we are wiping off the board
                         # I'm not quite sure what this threshold should be
                         # But it felt appropriate to allow more wandering around when the playing field is bigger
 

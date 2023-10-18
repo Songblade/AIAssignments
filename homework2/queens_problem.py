@@ -55,6 +55,5 @@ def display(columns):
                 print(' .', end=' ')
         print()
 
-# TODO: Do Heuristic Repair/Stochastic Search
 # TODO: Do Forward Checking
-# TODO: Update DFS and British Museum if removal counts as a move
+# TODO: Recollect data for British Museum and Hill Climbing

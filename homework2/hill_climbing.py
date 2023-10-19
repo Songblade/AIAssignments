@@ -19,20 +19,24 @@ def solve_queen(size):
         columns = queens_problem.place_n_queens(size)
 
         number_of_moves += size  # since we have put down that many queens
+        number_of_iterations += 1  # this isn't really a separate iteration, but you probably consider it that way,
+        # since we are putting down queens
         plateau_count = 0
 
         # central loop, where we search for the best move and do it
         while not should_random_restart:
             best_move = None
             best_fitness = float('-inf')
+            number_of_iterations += 1  # Even if nothing else counts as an iteration, this does
 
             # I start by going through each possibility and evaluating its fitness
             # If it is better, I replace my current best
             # If not, I ditch my current best
             for row in range(size):
-                # I am not increasing iterations here, because I do so in the fitness function instead
                 # Fitness measures number of conflicts, so we want to find what has the biggest fitness and fix it
-                fitness, number_of_iterations = fitness_function(columns, row, number_of_iterations)
+                # But nothing here should count for the number_of_iterations, because you said on Piazza that figuring
+                # out where not to go doesn't count as an iteration
+                fitness = fitness_function(columns, row)
                 if fitness > best_fitness or (fitness == best_fitness and random.random() > 0.5):
                     # if it's a bigger problem, or it is the same level problem, in which case we flip a coin
                     # then we record the new value
@@ -60,9 +64,10 @@ def solve_queen(size):
                         # But it felt appropriate to allow more wandering around when the playing field is bigger
 
 
-# choose best move
 def choose_best_move(columns, row, num_iterations):
     # we need to figure out what the best way to move it is
+    # Choosing the best move is the same as choosing which moves not to do, which you said doesn't count as an iteration
+    # Since we only actually move the queen outside, in the main loop
 
     horizontal_conflicts = {}
     up_diagonal_conflicts = {}
@@ -96,7 +101,9 @@ def choose_best_move(columns, row, num_iterations):
 # This is the fitness function I will be using
 # It determines how many other queens the queen in this row is in conflict with
 # It also updates the num_iterations accordingly
-def fitness_function(columns, row, num_iterations):
+# According to Piazza, since this just determines which queens might be good or not good to go, it doesn't count as an
+# iteration for num_iterations, so I'm not counting it
+def fitness_function(columns, row):
     # there are no vertical conflicts by the definition of the data structure
     # to check horizontal conflicts, we check how many have the column's row
 
@@ -113,8 +120,7 @@ def fitness_function(columns, row, num_iterations):
     num_conflicts += sum(1 for this_row, col in enumerate(columns) if this_row + col == row + columns[row]) - 1
     # Downward diagonal
     num_conflicts += sum(1 for this_row, col in enumerate(columns) if this_row - col == row - columns[row]) - 1
-    num_iterations += 3 * len(columns)
-    return num_conflicts, num_iterations
+    return num_conflicts
 
 
 '''

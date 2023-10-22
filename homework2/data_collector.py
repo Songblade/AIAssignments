@@ -31,13 +31,17 @@ def collect_data_for_queens_algorithm(algorithm, trying_hard):
             total_iterations += results[0]
             total_moves += results[1]
             total_time += results[2]
+            if total_time > 240 and num_queens > 10:
+                # if this is taking far too long, let's break it now
+                print("With " + str(num_queens) + ", it took too long, I grew too impatient, and I broke early.")
+                return
         average_iterations = total_iterations / 100
         average_moves = total_moves / 100
         average_time = total_time / 100
         print("With " + str(num_queens) + ", we have " + str(average_iterations) + " iterations, " +
               str(average_moves) + " moves, and " + str(average_time) + " seconds")
         elapsed_time = time.time() - start_time
-        num_queens += 1
+        num_queens += 1 if num_queens < 40 else 10
 
 
 # we are taking too long if a single iteration of 100 took more than a second each
@@ -50,8 +54,8 @@ def taking_too_long(elapsed_time, trying_hard):
 
 
 # run_and_display_queens_algorithm(dfs_with_backtracking.solve_queen, 20)
-run_and_display_queens_algorithm(hill_climbing.solve_queen, 1000)
-# collect_data_for_queens_algorithm(dfs_with_backtracking.solve_queen, False)
+# run_and_display_queens_algorithm(forward_checking.solve_queen, 90)
+collect_data_for_queens_algorithm(dfs_with_backtracking.solve_queen, False)
 # collect_data_for_queens_algorithm(british_museum.solve_queen, False)
 # collect_data_for_queens_algorithm(hill_climbing.solve_queen, False)
-
+# collect_data_for_queens_algorithm(forward_checking.solve_queen, False)

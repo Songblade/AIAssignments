@@ -51,8 +51,7 @@ def solve_queen(size):
                 return number_of_iterations, number_of_moves
             else:
                 # Since we have a problem to fix, we take the problematic column, find the best move, and do it
-                columns[best_move], min_value, number_of_iterations = choose_best_move(columns, best_move,
-                                                                                       number_of_iterations)
+                columns[best_move], min_value = choose_best_move(columns, best_move)
                 number_of_moves += 2
                 if min_value == best_fitness:  # if the number of conflicts we have after the move equals the
                     # number we had before the move
@@ -64,7 +63,7 @@ def solve_queen(size):
                         # But it felt appropriate to allow more wandering around when the playing field is bigger
 
 
-def choose_best_move(columns, row, num_iterations):
+def choose_best_move(columns, row):
     # we need to figure out what the best way to move it is
     # Choosing the best move is the same as choosing which moves not to do, which you said doesn't count as an iteration
     # Since we only actually move the queen outside, in the main loop
@@ -94,8 +93,7 @@ def choose_best_move(columns, row, num_iterations):
             min_value = value
             min_column = column
 
-    num_iterations += 2 * len(columns)  # because we loop twice through the rows
-    return min_column, min_value, num_iterations
+    return min_column, min_value
 
 
 # This is the fitness function I will be using

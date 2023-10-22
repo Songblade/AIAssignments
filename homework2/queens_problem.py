@@ -55,5 +55,5 @@ def display(columns):
                 print(' .', end=' ')
         print()
 
-# TODO: Do Forward Checking
+# TODO: Fix Forward Checking
 # TODO: Recollect data for British Museum and Hill Climbing

@@ -62,6 +62,9 @@ def solve_queen(size):
                         # I'm not quite sure what this threshold should be
                         # But it felt appropriate to allow more wandering around when the playing field is bigger
 
+                else:
+                    plateau_count = 0  # We have progressed, so we shouldn't be using the old plateau count
+
 
 def choose_best_move(columns, row):
     # we need to figure out what the best way to move it is

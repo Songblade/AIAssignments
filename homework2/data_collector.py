@@ -26,7 +26,8 @@ def collect_data_for_queens_algorithm(algorithm, trying_hard):
     while not taking_too_long(elapsed_time, trying_hard):
         start_time = time.time()
         total_iterations, total_moves, total_time = 0, 0, 0
-        for i in range(100):
+        num_iterations = 100
+        for i in range(num_iterations):
             results = run_and_display_queens_algorithm(algorithm, num_queens, False)
             total_iterations += results[0]
             total_moves += results[1]
@@ -35,11 +36,12 @@ def collect_data_for_queens_algorithm(algorithm, trying_hard):
                 # if this is taking far too long, let's break it now
                 print("With " + str(num_queens) + ", it took too long, I grew too impatient, and I broke early.")
                 return
-        average_iterations = total_iterations / 100
-        average_moves = total_moves / 100
-        average_time = total_time / 100
-        print("With " + str(num_queens) + ", we have " + str(average_iterations) + " iterations, " +
-              str(average_moves) + " moves, and " + str(average_time) + " seconds")
+        average_iterations = total_iterations / num_iterations
+        average_moves = total_moves / num_iterations
+        average_time = total_time / num_iterations
+        # print("With " + str(num_queens) + ", we have " + str(average_iterations) + " iterations, " +
+        #       str(average_moves) + " moves, and " + str(average_time) + " seconds")
+        print(str(num_queens) + "," + str(average_iterations) + "," + str(average_moves) + "," + str(average_time))
         elapsed_time = time.time() - start_time
         num_queens += 1 if num_queens < 40 else 10
 
@@ -56,6 +58,6 @@ def taking_too_long(elapsed_time, trying_hard):
 # run_and_display_queens_algorithm(dfs_with_backtracking.solve_queen, 20)
 # run_and_display_queens_algorithm(forward_checking.solve_queen, 90)
 collect_data_for_queens_algorithm(dfs_with_backtracking.solve_queen, False)
-# collect_data_for_queens_algorithm(british_museum.solve_queen, False)
-# collect_data_for_queens_algorithm(hill_climbing.solve_queen, False)
-# collect_data_for_queens_algorithm(forward_checking.solve_queen, False)
+collect_data_for_queens_algorithm(british_museum.solve_queen, True)
+collect_data_for_queens_algorithm(hill_climbing.solve_queen, False)
+collect_data_for_queens_algorithm(forward_checking.solve_queen, False)

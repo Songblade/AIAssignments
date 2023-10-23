@@ -2,35 +2,6 @@ import queens_problem
 import random
 
 
-'''
-Okay. So, how do I implement this?
-I need to keep track of which places we have pruned so that I don't go down paths I know won't work.
-So, whenever I add a queen, I add its row and both diagonals to their respective sets
-Whenever I check if I want to put a - hey, wait, this won't work. The entire point is to check when I know it will no
-longer propagate.
-So, either way, I would want a stack of board states.
-But when I add a queen, I would go through its row and both diagonals and remove possibilities.
-If we ever reach a state where a column's possibilities are all full, we know we made a mistake.
-That will be my first attempt.
-
-Let's see. How do I want to store my lookahead?
-I am thinking of a 2D structure, where if a row is full (or empty, whichever I decide) then there are no more
-possibilities for that row. Let's say when it's empty, so that if it isn't, we can iterate through it.
-Each row should be a set, so that when we remove or check emptiness, it's an O(1) operation.
-But the rows should be stored in a list so they can be indexed.
-Actually, they should be in a dictionary, so that I can keep removing rows but have the remaining ones keep their value.
-Actually, it will be simpler not to remove the rows, so let's keep it as a list.
-
-Things to do:
-Update the lookahead when we place a queen. When doing so, we also need to check if a row is no longer viable. If so,
-we need to roll back this decision.
-When we make a decision, we put the resulting lookahead on the stack. When we roll back a decision, we replace our 
-lookahead with one from the stack. Although, actually, I don't need a stack. It will be simpler just to have an array.
-So, when we make a decision, we add the old lookahead onto the array first for the row we just put a queen in.
-Then, when we roll back a decision, we put take the old lookahead from the index we are rolling back to.
-'''
-
-
 def solve_queen(size):
 
     past_moves = []  # stores the set of moves that we got rid of when we placed a queen in row i
@@ -137,38 +108,3 @@ def revert_lookahead(lookahead, set_of_moves):
     for move in set_of_moves:
         lookahead[move[0]].add(move[1])
     return lookahead
-
-
-'''
-Problem: Everything is too slow. In order to fix that, I need to remove code in the innermost loop.
-Looking at things, we have 3 innermost loops: deepcopy, update_lookahead, and rollback. Of them, update_lookahead and
-rollback are both O(n). But deepcopy is O(n^2) and thus taking up the most time.
-
-So, how do I fix it? Either way, I need to be able to roll things back.
-But I had an idea. Rather than copying the whole list, I simply record which things I'm adding and put them on a stack.
-Then, when I roll back, I can pop these elements off and add them back. Placing a queen would add, at minimum, 3n
-elements, and adding 3n elements is O(n).
-My problem is that this shifts the the weight of doing the work for rollback. Right now, each iteration of rollback does
-O(1) work reverting our lookahead to a previous version we have stored. This would change it to O(n) where it has to
-manually add each element. And rollback is already in the main loop.
-But rollback isn't really in the main loop. It really operates in parallel. Rollback is what happens whenever I rollback
-With this change, adding is O(n) and removing is also O(n). That seems more balanced.
-
-Note: I collected the set of moves. I need to add it to history and remove it from history, but I'm taking a snack break
-
-Hold on. I think I figured out why my code isn't working. When I roll back, I don't put back any moves I took out from
-my tree. But, sometimes I need to. For example, let's say that in row 0, I put down queen 0. Then in row 1, I put down 
-queen 2. When doing so, I use up queen 2. Later, it could be that this doesn't work. When we roll everything back, we 
-put all the things that queen 2 Assured - like queen 2 in subsequent rows - back. But, we never put queen 2 back, even 
-though that when we start row 0 with queen 4, queen 2 in row 1 suddenly should be a valid move again.
-
-Clearly, I need to add queen 2 to my recursive history somewhere. But where? If I put queen 2 in the same place in the
-stack as all the things that it Assured, then when we roll back queen 2, we also put it back in the drawing pile.
-Instead, I think I need to put queen 2 into the pile that is for the index before queen 2. In this case, we would add it
-to the rollback for row 0. So, when we roll back queen 0, queen (0, 2) would become available again. This should work
-and I'm happy with it. Let's implement it.
-
-Right now, my algorithm's performance is extremely variable. For some numbers of queens it does great, for others it 
-does terribly. I'm tempted to add a random element to even things out, but he might not want that. So, let's stop and
-think if I can think of a non-random way to make sure I try better elements first.
-'''

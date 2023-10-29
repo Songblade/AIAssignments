@@ -32,11 +32,12 @@ def abmax(s, d, a, b):
             a = v
     return [v, bestMove]
 
-    # s = the state (min's turn)
-    # d = max. depth of search
-    # a,b = alpha and beta
-    # returns [v, ns]: v = state s's value. ns = the state after recomended move.
-    #        if s is a terminal state ns=0.
+
+# s = the state (min's turn)
+# d = max. depth of search
+# a,b = alpha and beta
+# returns [v, ns]: v = state s's value. ns = the state after recomended move.
+#        if s is a terminal state ns=0.
 def abmin(s, d, a, b):
     if d == 0 or game.isFinished(s):
         return [game.value(s), 0]

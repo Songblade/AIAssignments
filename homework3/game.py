@@ -24,7 +24,11 @@ The state of the game is represented by a list of 4 items:
 def whoIsFirst(s):
     global HUMAN, COMPUTER
 
-    s[2] = HUMAN  ### your code here ###
+    going_first = input("Would you like to go first or second?" "\n" "Print 'first' or 'second': ")
+    if going_first.lower() == "second":
+        s[2] = HUMAN
+    else:
+        s[2] = COMPUTER
 
     return s
 
@@ -92,11 +96,45 @@ def value(s):
 def isFinished(s):
     # Returns True if the game ended
 
-    # ## your code here ###
+    # I probably don't need to worry about O(n^2), because I bet alphaBetaPruning is similarly bad
+    # Question is how to actually do that
+    # For whoever's turn it is, I need to check to see if they have any moves
+    # So, I traverse the board searching for blanks
+    # For each adjacent blank, I need to check if, on any side or corner, there is a piece of the opposite color
+    # If there is, then we progress on that line. If we see a piece of the opposite color again, we progress.
+    # If we see a piece of our color, we return false.
+    # If we see a blank, then this line is a dud.
+    # When we try every line
 
-    return (s[3])
+    # But hold on. This makes no sense. We already have a method that checks exactly what I described called
+    # anyLegalMoves, which we call if this fails.
+    # So I need to trace the code
+    # If the game is finished and there isn't another chance:
+    # If anyLegalMove returns true, which means that we still have a legal move:
+    # Then we print that we have one more chance and change player, which we normally only do after a move is made.
+    # If we don't have any legal moves, oneMoreChance is made false
+    # Hold on. I don't know why oneMoreChance is even here. It doesn't do anything. It is always false and never made
+    # true. This is stupid.
+
+    # Yes, this is stupid. I'm just going to ignore all his code and do things my way, because his way doesn't make any
+    # sense.
+    # So, what do I want? At the beginning of each loop, we check if the game is finished. If the player has no more
+    # moves, then we say one more chance and flip it to the opponent. If that player can't do anything either, the game
+    # is over.
+    # Meanwhile, if that player can do something:
+
+    # Okay. I just did some research. I have absolutely no idea what one-more-chance actually means. According to
+    # Wikipedia, there is no one more chance, and if one player can't make a move, they just pass. But the next player
+    # can keep playing either until the other player can make moves again or no one can.
+
+    # Okay. Now I know that anyLegalMove checks if there is any legal move for the current player.
+    # Since he explicitly said that we don't need to worry if this player can't go but the other one can't,
+    # All I need to do to determine isFinished is call anyLegalMove
+    # That makes this function completely redundant, but that's the professor's fault in play.py
+    return not anyLegalMove(s)
 
 
+# returns true if the move is legal for the current player, false otherwise
 def isLegal(move, s):
     hasbracket = lambda direction: findBracket(move, s, direction)
     return s[0][move] == EMPTY and any(map(hasbracket, DIRECTIONS))
@@ -110,7 +148,7 @@ def legalMoves(s):
 # Is there any legal move for this player
 def anyLegalMove(s):
     isAny = any(isLegal(sq, s) for sq in squares())
-    if (not (isAny)):
+    if not isAny:
         s[3] = True
     return isAny
 
@@ -166,6 +204,10 @@ def isValid(move):
     return isinstance(move, int) and move in squares()
 
 
+# This function takes a square and a direction from that square. It checks if pieces are arranged in that direction
+# such that this square is a flanking move from that direction
+# If the square is a valid move from this direction, it returns the other square of your color you are flanking with
+# Otherwise, it returns None
 def findBracket(square, s, direction):
     bracket = square + direction
     if s[0][bracket] == s[2]:

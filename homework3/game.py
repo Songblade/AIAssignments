@@ -26,9 +26,9 @@ def whoIsFirst(s):
 
     going_first = input("Would you like to go first or second?" "\n" "Print 'first' or 'second': ")
     if going_first.lower() == "second":
-        s[2] = HUMAN
-    else:
         s[2] = COMPUTER
+    else:
+        s[2] = HUMAN
 
     return s
 

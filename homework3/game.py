@@ -87,51 +87,146 @@ def inputMove(s):
             makeMove(move, s)
 
 
+# These are the definitions of the groups of pieces that I used in my main value function
+CORNERS = (11, 18, 81, 88)
+DANGEROUS_EDGES = (12, 21, 17, 28, 71, 82, 78, 87)
+SAFE_EDGES = (13, 14, 15, 16, 31, 41, 51, 61, 38, 48, 58, 68, 83, 84, 85, 86)
+CORNER_RISKS = (22, 27, 72, 77)
+EDGE_RISKS = (23, 24, 25, 26, 32, 42, 52, 62, 37, 47, 57, 67, 73, 74, 75, 76)
+CENTRAL_PIECES = (33, 34, 35, 36, 43, 44, 45, 46, 53, 54, 55, 56, 63, 64, 65, 66)
+
+
 def value(s):
     # Returns the heuristic value of s
-    s[1] = 1  # ## your code here ###
+    if is_next_player_finished(s):  # if the next player is out of moves, which we are treating as the end of the game
+        # then the value is equal to victory, loss, or tie
+        # value is called immediately before changePlayer, so s[2] contains the player who just put down a piece
+        s[1] = whoWin(s)
+    else:  # if the game isn't over, evaluate according to my heuristic
+        s[1] = 0
+        computer_exception = set()
+        human_exception = set()
+        # first we check the corners, adding their value and noting if they make certain places safe
+        for corner in CORNERS:
+            piece = s[0][corner]
+            if piece == COMPUTER:
+                s[1] += 119
+                computer_exception.update(corner + direction for direction in DIRECTIONS)
+            elif piece == HUMAN:
+                s[1] -= 119
+                human_exception.update(corner + direction for direction in DIRECTIONS)
+        # now we check the edge pieces that are adjacent to corners, either giving them a reverse value if they aren't
+        # an exception or the normal edge value if they are
+        for edge in DANGEROUS_EDGES:
+            piece = s[0][edge]
+            if piece == COMPUTER and edge in computer_exception:
+                s[1] += 17
+            elif piece == COMPUTER:
+                s[1] -= 59.5  # since it could lead to losing a corner
+            elif piece == HUMAN and edge in human_exception:
+                s[1] -= 17  # since they have an edge
+            elif piece == HUMAN:
+                s[1] += 59.5  # because it could help us get a corner
+        # now we check the extremely dangerous almost-corner pieces
+        for square in CORNER_RISKS:
+            piece = s[0][square]
+            if piece == COMPUTER and square in computer_exception:
+                s[1] += 1
+            elif piece == COMPUTER:
+                s[1] -= 59.5  # since it could lead to losing a corner
+            elif piece == HUMAN and square in human_exception:
+                s[1] -= 1  # since they have a piece
+            elif piece == HUMAN:
+                s[1] += 59.5  # because it could help us get a corner
+        # Now we check the remaining 16 edges
+        for edge in SAFE_EDGES:
+            piece = s[0][edge]
+            if piece == COMPUTER:
+                s[1] += 17
+                computer_exception.update(edge + direction for direction in DIRECTIONS)
+            elif piece == HUMAN:
+                s[1] -= 17
+                human_exception.update(edge + direction for direction in DIRECTIONS)
+        # now we check the remaining dangerous pieces that could lose an edge
+        for square in EDGE_RISKS:
+            piece = s[0][square]
+            if piece == COMPUTER and square in computer_exception:
+                s[1] += 1
+            elif piece == COMPUTER:
+                s[1] -= 8.5  # since it could lead to losing an edge
+            elif piece == HUMAN and square in human_exception:
+                s[1] -= 1  # since they have a piece
+            elif piece == HUMAN:
+                s[1] += 8.5  # because it could help us get an edge
+        # finally, we add the regular squares
+        for square in CENTRAL_PIECES:
+            piece = s[0][square]
+            if piece == COMPUTER:
+                s[1] += 1
+            elif piece == HUMAN:
+                s[1] -= 1
+
+        # if s[1] == TIE, but it isn't a tie because the game isn't over, we replace it with a very small value
+        # So that the game won't scream that it's a tie
+        if s[1] == TIE:
+            s[1] = 0.00001
+
     return s[1]
+
+
+# Checks if the other player is finished, used in my heuristic
+def is_next_player_finished(board):
+    board[2] = COMPUTER if board[2] == HUMAN else HUMAN
+    result = isFinished(board)
+    board[2] = COMPUTER if board[2] == HUMAN else HUMAN
+    return result
+
+
+# I chose not to use this, but if you don't like my primary heuristic, this one is simpler and slightly faster,
+# if inferior
+# it simply makes dangerous moves have half the value that they would normally have
+def alt_value(s):
+    # Returns the heuristic value of s
+    if isFinished(s):  # if a player is out of moves, which we are treating as the end of the game
+        # then the value is equal to victory, loss, or tie
+        # I have to check here, because otherwise it is only checked after value is done
+        s[1] = whoWin(s)
+    else:
+        s[1] = 0
+        for square in squares():
+            piece = s[0][square]
+            if piece == COMPUTER:
+                s[1] += evaluate_position(square)
+            elif piece == HUMAN:
+                s[1] -= evaluate_position(square)
+
+        # if s[1] == TIE, but it isn't a tie because the game isn't over, we replace it with a very small value
+        # So that the game won't scream that it's a tie
+        if s[1] == TIE:
+            s[1] = 0.00001
+
+    return s[1]
+
+
+# returns a number that says how valuable any given square is
+def evaluate_position(square):
+    danger_zone = (square % 10 in (1, 2, 7, 8) and square // 10 in (1, 2, 7, 8)) or ((square % 10 == 2 or square % 10 == 7) or (square // 10 == 2 or square // 10 == 7))
+    if (square % 10 == 1 or square % 10 == 8) and (square // 10 == 1 or square // 10 == 8):  # corner piece
+        return 119
+    elif (square % 10 == 1 or square % 10 == 8) or (square // 10 == 1 or square // 10 == 8):  # edge piece
+        return 17 if not danger_zone else 8.5
+    else:  # central piece
+        return 1 if not danger_zone else 0.5
 
 
 def isFinished(s):
     # Returns True if the game ended
 
-    # I probably don't need to worry about O(n^2), because I bet alphaBetaPruning is similarly bad
-    # Question is how to actually do that
-    # For whoever's turn it is, I need to check to see if they have any moves
-    # So, I traverse the board searching for blanks
-    # For each adjacent blank, I need to check if, on any side or corner, there is a piece of the opposite color
-    # If there is, then we progress on that line. If we see a piece of the opposite color again, we progress.
-    # If we see a piece of our color, we return false.
-    # If we see a blank, then this line is a dud.
-    # When we try every line
-
-    # But hold on. This makes no sense. We already have a method that checks exactly what I described called
-    # anyLegalMoves, which we call if this fails.
-    # So I need to trace the code
-    # If the game is finished and there isn't another chance:
-    # If anyLegalMove returns true, which means that we still have a legal move:
-    # Then we print that we have one more chance and change player, which we normally only do after a move is made.
-    # If we don't have any legal moves, oneMoreChance is made false
-    # Hold on. I don't know why oneMoreChance is even here. It doesn't do anything. It is always false and never made
-    # true. This is stupid.
-
-    # Yes, this is stupid. I'm just going to ignore all his code and do things my way, because his way doesn't make any
-    # sense.
-    # So, what do I want? At the beginning of each loop, we check if the game is finished. If the player has no more
-    # moves, then we say one more chance and flip it to the opponent. If that player can't do anything either, the game
-    # is over.
-    # Meanwhile, if that player can do something:
-
-    # Okay. I just did some research. I have absolutely no idea what one-more-chance actually means. According to
-    # Wikipedia, there is no one more chance, and if one player can't make a move, they just pass. But the next player
-    # can keep playing either until the other player can make moves again or no one can.
-
-    # Okay. Now I know that anyLegalMove checks if there is any legal move for the current player.
-    # Since he explicitly said that we don't need to worry if this player can't go but the other one can't,
-    # All I need to do to determine isFinished is call anyLegalMove
-    # That makes this function completely redundant, but that's the professor's fault in play.py
-    return not anyLegalMove(s)
+    # I mostly just used the code in anyLegalMove, which already basically does this
+    # but anyLegalMove only does this if is_any is false, which is why I didn't call it
+    is_any = any(isLegal(sq, s) for sq in squares())
+    s[3] = not is_any
+    return not is_any
 
 
 # returns true if the move is legal for the current player, false otherwise
@@ -194,9 +289,10 @@ def whoWin(s):
     elif computerScore < humanScore:
         return LOSS
 
-    elif computerScore == HUMAN:
+    elif computerScore == humanScore:  # I found a bug. This should be computerScore == humanScore, but you did
+        # computerScore == HUMAN, which is obviously false
         return TIE
-
+    # why is this even here? It's impossible to reach!
     return 0.00001  # not 0 because TIE is 0
 
 

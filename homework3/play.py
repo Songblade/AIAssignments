@@ -5,6 +5,7 @@ game.whoIsFirst(board)
 
 # I removed oneMoreChance. It's always false, so if I replace it with False, it shouldn't matter
 # But it will make it easier to figure out what this does
+# If you want to test with your own play file, it should make no difference
 while not game.isFinished(board):
     if game.isHumTurn(board):
         game.inputMove(board)

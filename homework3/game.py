@@ -87,6 +87,49 @@ def inputMove(s):
             makeMove(move, s)
 
 
+'''
+Heuristic documentation:
+
+After playing 3 games of Othello against my 10-year-old brother (I only won the third time), I learned the following
+strategy:
+
+First, I decided on the relative worth of corners, edges, and other pieces. I gave regular pieces a value of 1. I
+decided that an edge should always be worth more than a regular piece, no matter how many other regular pieces it flips.
+I calculated that placing a regular piece could flip no more than 15 other pieces (best-case scenario), for 16 pieces
+total. So I gave edges a value of 17, to always be better.
+
+Likewise, a corner should always be better than an edge, no matter how many other edges the edge gets you. An edge can
+flip no more than 5 other edges, for 6 edges total. So, I made the corners worth 7 edges, for 119 points total. I also
+used these values for the dummy I use to test my code, which knows this and only this.
+
+But playing against my little brother, I learned that certain positions are inherently dangerous, because they can (and
+probably will) cause you to lose an edge or even a corner.
+
+As such, I divided all the pieces on the board into 6 categories: corners, dangerous edges, safe edges, corner risks,
+edge risks, and central pieces. Corners, safe edges, and central pieces all act like the corners, edges, and normal 
+pieces that I described above.
+
+Edge risks are normal pieces adjacent to edges. Since they could cause you to forfeit that edge, I gave them a negative
+value of half the value of the edge that they are giving up. However, if you already have that edge, then they become
+ordinary pieces.
+
+Dangerous edges are edges adjacent to a corner that could cause you to forfeit that corner. As such, I gave them a
+negative value of half the value of the corner that they are giving up. Once again, if you already have that corner,
+then they become ordinary edges.
+
+Corner risks are normal pieces diagonally connected to the corner (and adjacent to dangerous edges). They have a nasty
+ability of forfeiting the corner, so I gave them a negative value of half the value of the corner that they are 
+forfeiting. If you already have that corner, they become ordinary pieces.
+
+If you think this is too complicated, I left in an earlier version of the heuristic as alt_value(). It still identifies
+the dangerous pieces, but rather than figuring out if you already have the corner or edge it's guarding, I just gave the
+piece half the value it would have had it been safe. This middling AI successfully beats my dummy, but it fails against
+my superior AI. It is a bit faster, though. (The longest game I have recorded was just over a minute and a half, with my
+superior AI playing against the middling one and the superior AI going first. It clocked in at just over a minute and a
+half.)
+'''
+
+
 # These are the definitions of the groups of pieces that I used in my main value function
 CORNERS = (11, 18, 81, 88)
 DANGEROUS_EDGES = (12, 21, 17, 28, 71, 82, 78, 87)

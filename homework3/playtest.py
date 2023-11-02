@@ -44,3 +44,4 @@ else:
 # Note: It took 1:32 for best algorithm going first, and 0:46 second
 # While the simpler algorithm takes 0:58 going first, and 0:35 second
 # When using the best algorithm against the dummy is 0:59 going first, and 1:06 on second
+# Against the random dummy, it gets about 1:08. The worst I measured 1:48

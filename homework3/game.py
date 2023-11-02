@@ -90,6 +90,9 @@ def inputMove(s):
 '''
 Heuristic documentation:
 
+Be aware that I originally thought that the requirement was to be able to beat an algorithm that understands that
+corners are better than edges which are better than other pieces. So, I over-engineered the algorithm a bit.
+
 After playing 3 games of Othello against my 10-year-old brother (I only won the third time), I learned the following
 strategy:
 

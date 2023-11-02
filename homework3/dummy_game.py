@@ -1,5 +1,6 @@
 import copy
 import game
+import random
 
 # this file contains the bad computer algorithm that I test my code against
 DEPTH = 5
@@ -7,10 +8,16 @@ DEPTH = 5
 
 # I don't want to define this up here, but otherwise, it isn't referenced for some reason
 def go(s):
+    # this is the new version of dummy that always chooses a random legal move
+    legal_moves = game.legalMoves(s)
+    move = random.choice(legal_moves)
+    make_move(move, s)
+    return s
+    '''  # Not code
     if game.isHumTurn(s):
         return ab_min(s, DEPTH, float("-inf"), float("inf"))[1]
     else:
-        return ab_max(s, DEPTH, float("-inf"), float("inf"))[1]
+        return ab_max(s, DEPTH, float("-inf"), float("inf"))[1] # '''
 
 
 # Everything from here and below is the alpha-beta for the dummy

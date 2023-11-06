@@ -233,7 +233,7 @@ def is_next_player_finished(board):
 # it simply makes dangerous moves have half the value that they would normally have
 def alt_value(s):
     # Returns the heuristic value of s
-    if isFinished(s):  # if a player is out of moves, which we are treating as the end of the game
+    if is_next_player_finished(s):  # if a player is out of moves, which we are treating as the end of the game
         # then the value is equal to victory, loss, or tie
         # I have to check here, because otherwise it is only checked after value is done
         s[1] = whoWin(s)

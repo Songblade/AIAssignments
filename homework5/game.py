@@ -1,4 +1,5 @@
 import copy
+import math
 import random
 
 VICTORY = 10**20  # The value of a winning board (for max)
@@ -216,3 +217,40 @@ def inputMC(s):
         else:
             flag = False
             makeMove(s, c)
+
+
+# These are the state used by ucb
+# C is a constant, and num_used and q_value are updated by ucb
+# But q_value needs to be updated outside of ucb based on how the move did
+num_used = [0, 0, 0, 0, 0, 0, 0]
+q_value = [0, 0, 0, 0, 0, 0, 0]
+C = math.sqrt(2)
+t = 1
+
+
+def ucb():
+    global t
+
+    choice = -1
+    max_val = 0
+    for move in range(7):
+        val = q_value[move] + C * math.sqrt(math.log(t) / num_used[move])
+        if val > max_val:
+            choice = move
+
+    num_used[choice] += 1
+    t += 1
+    return choice
+
+
+'''
+Don't forget to delete this later.
+So, I need to remember how Monte Carlo even works.
+First, we select a move.
+Then, we grow a tree from that node.
+Then, we play a game from that node.
+Then, we update our info.
+
+Okay, so, let's start with selection. The slide suggests UCB. So, how do we do that again?
+
+'''

@@ -10,8 +10,8 @@ for i in range(0, 100):  # This loops takes about 15 seconds on my computer
     while not game.isFinished(board):
         if game.isHumTurn(board):  # The simple agent plays "Human"
             # game.inputMove(board)
-            game.inputHeuristic(board)
-            # game.inputRandom(board)
+            # game.inputHeuristic(board)
+            game.inputRandom(board)
         else:
             game.inputMC(board)  # The MC agent plays "Computer"
         game.printState(board)

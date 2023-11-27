@@ -7,6 +7,8 @@ Original file is located at
     https://colab.research.google.com/drive/12iAwDFO1I1OATbQTZ1XlVgOavVbGm20r
 
 Import the libraries math (for square root and absolute value) and pandas and numpy for reading csv files.
+
+NOTE: My solution is found in the homework_solution.py file, not here
 """
 
 import math

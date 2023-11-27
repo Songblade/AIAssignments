@@ -19,13 +19,15 @@ def euclidean_distance(instance1, instance2, length):
 def manhattan_distance(instance1, instance2, length):
     # Using a pythonic method makes me cooler
     return sum(
-        abs(float(instance1[i] - float(instance2[i]))) for i in range(length)
+        abs(float(instance1[i] - float(instance2[i])))
+        for i in range(length)
     )
 
 
 def hamming_distance(instance1, instance2, length):
     return sum(
-        1 if instance1[i] != instance2[i] else 0 for i in range(length)
+        1 if instance1[i] != instance2[i] else 0
+        for i in range(length)
     )
 
 
@@ -33,6 +35,7 @@ class DistPoint:
     dist = -1  # distance of current point from test point
     tag = '-'  # tag of current point
 
+    # I wanted a constructor to make using it easier
     def __init__(self, dist, tag='-'):
         self.dist = dist
         self.tag = tag
@@ -50,17 +53,20 @@ Return the most common tag
 
 # Note: This function assumes that the new_point has a tag at the end, even if it is blank
 def knn(dataset, length, distance_function, k, new_point):
-    # This list comprehension finds the length between 2 points and adds it to the list
+    # This list comprehension finds the length between 2 points, excluding the tag, and adds it to the list
+    # Using point[-1] as the tag
     measured_points = [DistPoint(distance_function(point[:-1], new_point[:-1], length), point[-1])
                        for point in dataset]
     measured_points.sort(key=lambda x: x.dist)
-    # Sums the number of male points
-    m_sum = sum(1 for point in measured_points[:k] if point.tag == 'M')
+    # Sums the number of male points among the first k points
+    m_sum = sum(1 for point in measured_points[:k]
+                if point.tag == 'M')
 
-    return 'M' if m_sum > k/2 else 'F'
+    return 'M' if m_sum > k/2 else 'F'  # If we have at least 50% male among the closest, return male, otherwise female
 
 
 def run_knn(distance_function, k):
+    # get the training and test data
     url = 'https://github.com/rosenfa/ai/blob/master/mytrain.csv?raw=true'
     train_data = np.array(pd.read_csv(url, header=0, on_bad_lines="skip"))
     url = 'https://github.com/rosenfa/ai/blob/master/mytest.csv?raw=true'

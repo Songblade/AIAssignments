@@ -9,6 +9,7 @@ comp_count = 0
 for i in range(0, 100):  # This loops takes about 15 seconds on my computer
     while not game.isFinished(board):
         if game.isHumTurn(board):  # The simple agent plays "Human"
+            # NOTE: Whenever you change the opponent here, also change it in the MC simulation
             # game.inputMove(board)
             # game.inputHeuristic(board)
             game.inputRandom(board)

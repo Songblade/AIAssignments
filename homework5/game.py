@@ -1,5 +1,4 @@
 import copy
-import math
 import random
 
 VICTORY = 10**20  # The value of a winning board (for max)
@@ -113,7 +112,7 @@ def printState(s):
     print()
 
     for i in range(columns):  # For numbers on the bottom
-        print(" ",i,sep="",end="")
+        print(" ", i, sep="", end="")
 
     print()
 
@@ -174,7 +173,7 @@ def inputMove(s):
             makeMove(s, c)
 
 
-def inputRandom(s):
+def inputRandom(s, should_print=True):
     # See if the agent can win block one move ahead
     for i in range(0, columns):  # this simple agent always plays min
         tmp = cpy(s)
@@ -187,8 +186,9 @@ def inputRandom(s):
     while flag:
         c = random.randrange(0, columns)
         if c < 0 or c >= columns or s.board[0][c] != 0:
-            print("Illegal move.")
-            printState(s)
+            if should_print:
+                print("Illegal move.")
+                printState(s)
         else:
             flag = False
             makeMove(s, c)
@@ -208,6 +208,28 @@ def inputHeuristic(s):
 
 
 def inputMC(s):
+    num_victories_with_moves = [0] * 7
+    num_move_uses = [0] * 7
+    for _ in range(30):  # maybe replace with 100
+        move = get_random_move(s)
+        num_move_uses[move] += 1
+        # play the game, and if we won, increase the number of victories by 1
+        num_victories_with_moves[move] += play_game_from_move(s, move)
+    # now, we have collected our data, and we must determine the best move
+    max_percentage = -1
+    best_move = -1
+    for move in range(7):
+        win_rate = 0 if num_move_uses[move] == 0 \
+            else num_victories_with_moves[move] / num_move_uses[move]
+        if win_rate > max_percentage:
+            best_move = move
+    # finally, we actually make the move we have determined is best
+    makeMove(s, best_move)
+    # also, print the board, at least for debugging, so I know my progress
+    printState(s)
+
+    '''
+    This is the code I am getting rid of. But I am keeping it in case I want it
     flag = True
     while flag:
         c = random.randrange(0, columns)
@@ -216,31 +238,36 @@ def inputMC(s):
             printState(s)
         else:
             flag = False
-            makeMove(s, c)
+            makeMove(s, c)'''
 
 
-# These are the state used by ucb
-# C is a constant, and num_used and q_value are updated by ucb
-# But q_value needs to be updated outside of ucb based on how the move did
-num_used = [0, 0, 0, 0, 0, 0, 0]
-q_value = [0, 0, 0, 0, 0, 0, 0]
-C = math.sqrt(2)
-t = 1
+def get_random_move(s):
+    while True:
+        c = random.randrange(0, columns)
+        if s.board[0][c] == 0:
+            # makeMove(s, c)
+            return c
 
 
-def ucb():
-    global t
-
-    choice = -1
-    max_val = 0
-    for move in range(7):
-        val = q_value[move] + C * math.sqrt(math.log(t) / num_used[move])
-        if val > max_val:
-            choice = move
-
-    num_used[choice] += 1
-    t += 1
-    return choice
+# NOTE: Whenever you change the opponent in play, change it here too
+# I have decided not to modify play to store which opponent we are using, which would allow me to only change it in one
+# place
+def play_game_from_move(state, move):
+    # this function clones the board and plays a game from this move
+    new_state = copy.deepcopy(state)
+    makeMove(new_state, move)
+    # I borrowed the rest of the simulation from play
+    # Unfortunately, it isn't very modular (and I can't return from inputMC with a different state), so I need to
+    # simulate the game in here
+    while not isFinished(new_state):
+        if isHumTurn(new_state):  # The simple agent plays "Human"
+            # game.inputMove(board)
+            # game.inputHeuristic(board)
+            inputRandom(new_state, False)
+        else:
+            move = get_random_move(new_state)
+            makeMove(new_state, move)
+    return 1 if value(new_state) == 10**20 else 0  # 1 means the MC agent won, 0 means it lost
 
 
 '''
@@ -252,5 +279,9 @@ Then, we play a game from that node.
 Then, we update our info.
 
 Okay, so, let's start with selection. The slide suggests UCB. So, how do we do that again?
+Except, apparently, we aren't actually using a tree at all. So...
+Instead, whenever we are asked to input a move:
+We randomly pick a move n times. Each time, we play a full random game from that point and record the results.
+Then, we actually pick the move that has the best ratio.
 
 '''

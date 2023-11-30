@@ -128,7 +128,7 @@ def printState(s):
 
 def isFinished(s):
     # returns True iff the game ended
-    return value(s) in [LOSS, VICTORY, TIE] or s.size ==0
+    return value(s) in [LOSS, VICTORY, TIE] or s.size == 0
 
 
 def isHumTurn(s):
@@ -208,53 +208,25 @@ def inputHeuristic(s):
 
 
 def inputMC(s):
-    num_plays = 30
+    num_plays = 50
 
     best_move = -1
     best_win_rate = -1
     for move in range(7):
-        num_victories = sum(
-            (play_game_from_move(s, move) for _ in range(num_plays))
-        )
-        win_rate = num_victories / num_plays
-        if win_rate > best_win_rate:
-            best_win_rate = win_rate
-            best_move = move
+        if s.board[0][move] == 0:
+            # No point in investigating the move if it's out of bounds
+            num_victories = sum(
+                (play_game_from_move(s, move) for _ in range(num_plays))
+            )
+            win_rate = num_victories / num_plays
+            if win_rate > best_win_rate:
+                best_win_rate = win_rate
+                best_move = move
 
     # finally, we actually make the move we have determined is best
     makeMove(s, best_move)
     # also, print the board, at least for debugging, so I know my progress
     printState(s)
-
-    '''
-    This is the code I am getting rid of. But I am keeping it in case I want it
-    flag = True
-    while flag:
-        c = random.randrange(0, columns)
-        if c < 0 or c >= columns or s.board[0][c] != 0:
-            print("Illegal move.")
-            printState(s)
-        else:
-            flag = False
-            makeMove(s, c)
-            
-    This is the new code I am getting rid of:
-    num_victories_with_moves = [0] * 7
-    num_move_uses = [0] * 7
-    for _ in range(30):  # maybe replace with 100
-        move = get_random_move(s)
-        num_move_uses[move] += 1
-        # play the game, and if we won, increase the number of victories by 1
-        num_victories_with_moves[move] += play_game_from_move(s, move)
-    # now, we have collected our data, and we must determine the best move
-    max_percentage = -1
-    best_move = -1
-    for move in range(7):
-        win_rate = 0 if num_move_uses[move] == 0 \
-            else num_victories_with_moves[move] / num_move_uses[move]
-        if win_rate > max_percentage:
-            best_move = move
-            '''
 
 
 def get_random_move(s):

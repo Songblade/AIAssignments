@@ -208,21 +208,19 @@ def inputHeuristic(s):
 
 
 def inputMC(s):
-    num_victories_with_moves = [0] * 7
-    num_move_uses = [0] * 7
-    for _ in range(30):  # maybe replace with 100
-        move = get_random_move(s)
-        num_move_uses[move] += 1
-        # play the game, and if we won, increase the number of victories by 1
-        num_victories_with_moves[move] += play_game_from_move(s, move)
-    # now, we have collected our data, and we must determine the best move
-    max_percentage = -1
+    num_plays = 30
+
     best_move = -1
+    best_win_rate = -1
     for move in range(7):
-        win_rate = 0 if num_move_uses[move] == 0 \
-            else num_victories_with_moves[move] / num_move_uses[move]
-        if win_rate > max_percentage:
+        num_victories = sum(
+            (play_game_from_move(s, move) for _ in range(num_plays))
+        )
+        win_rate = num_victories / num_plays
+        if win_rate > best_win_rate:
+            best_win_rate = win_rate
             best_move = move
+
     # finally, we actually make the move we have determined is best
     makeMove(s, best_move)
     # also, print the board, at least for debugging, so I know my progress
@@ -238,7 +236,25 @@ def inputMC(s):
             printState(s)
         else:
             flag = False
-            makeMove(s, c)'''
+            makeMove(s, c)
+            
+    This is the new code I am getting rid of:
+    num_victories_with_moves = [0] * 7
+    num_move_uses = [0] * 7
+    for _ in range(30):  # maybe replace with 100
+        move = get_random_move(s)
+        num_move_uses[move] += 1
+        # play the game, and if we won, increase the number of victories by 1
+        num_victories_with_moves[move] += play_game_from_move(s, move)
+    # now, we have collected our data, and we must determine the best move
+    max_percentage = -1
+    best_move = -1
+    for move in range(7):
+        win_rate = 0 if num_move_uses[move] == 0 \
+            else num_victories_with_moves[move] / num_move_uses[move]
+        if win_rate > max_percentage:
+            best_move = move
+            '''
 
 
 def get_random_move(s):
@@ -249,24 +265,17 @@ def get_random_move(s):
             return c
 
 
-# NOTE: Whenever you change the opponent in play, change it here too
-# I have decided not to modify play to store which opponent we are using, which would allow me to only change it in one
-# place
 def play_game_from_move(state, move):
     # this function clones the board and plays a game from this move
-    new_state = copy.deepcopy(state)
+    new_state = cpy(state)
     makeMove(new_state, move)
     # I borrowed the rest of the simulation from play
     # Unfortunately, it isn't very modular (and I can't return from inputMC with a different state), so I need to
     # simulate the game in here
     while not isFinished(new_state):
-        if isHumTurn(new_state):  # The simple agent plays "Human"
-            # game.inputMove(board)
-            # game.inputHeuristic(board)
-            inputRandom(new_state, False)
-        else:
-            move = get_random_move(new_state)
-            makeMove(new_state, move)
+        # It doesn't matter whose turn it is, make a random move
+        move = get_random_move(new_state)
+        makeMove(new_state, move)
     return 1 if value(new_state) == 10**20 else 0  # 1 means the MC agent won, 0 means it lost
 
 

@@ -65,7 +65,7 @@ def value(s):
                 else:
                     val += t
     if s.size == 0 and val not in [LOSS, VICTORY]:
-       val = TIE
+        val = TIE
     return val
 
 
@@ -173,7 +173,7 @@ def inputMove(s):
             makeMove(s, c)
 
 
-def inputRandom(s, should_print=True):
+def inputRandom(s):
     # See if the agent can win block one move ahead
     for i in range(0, columns):  # this simple agent always plays min
         tmp = cpy(s)
@@ -185,11 +185,7 @@ def inputRandom(s, should_print=True):
     flag = True
     while flag:
         c = random.randrange(0, columns)
-        if c < 0 or c >= columns or s.board[0][c] != 0:
-            if should_print:
-                print("Illegal move.")
-                printState(s)
-        else:
+        if not (c < 0 or c >= columns or s.board[0][c] != 0):
             flag = False
             makeMove(s, c)
 
@@ -208,7 +204,7 @@ def inputHeuristic(s):
 
 
 def inputMC(s):
-    num_plays = 50
+    num_plays = 100
 
     best_move = -1
     best_win_rate = -1
@@ -226,7 +222,7 @@ def inputMC(s):
     # finally, we actually make the move we have determined is best
     makeMove(s, best_move)
     # also, print the board, at least for debugging, so I know my progress
-    printState(s)
+    # printState(s)
 
 
 def get_random_move(s):
@@ -246,7 +242,13 @@ def play_game_from_move(state, move):
     # simulate the game in here
     while not isFinished(new_state):
         # It doesn't matter whose turn it is, make a random move
-        move = get_random_move(new_state)
+        flag = True
+        while flag:
+            c = random.randrange(0, columns)
+            if state.board[0][c] == 0:
+                # makeMove(s, c)
+                move = c
+                flag = False
         makeMove(new_state, move)
     return 1 if value(new_state) == 10**20 else 0  # 1 means the MC agent won, 0 means it lost
 

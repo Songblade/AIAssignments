@@ -225,14 +225,6 @@ def inputMC(s):
     # printState(s)
 
 
-def get_random_move(s):
-    while True:
-        c = random.randrange(0, columns)
-        if s.board[0][c] == 0:
-            # makeMove(s, c)
-            return c
-
-
 def play_game_from_move(state, move):
     # this function clones the board and plays a game from this move
     new_state = cpy(state)
@@ -242,29 +234,19 @@ def play_game_from_move(state, move):
     # simulate the game in here
     while not isFinished(new_state):
         # It doesn't matter whose turn it is, make a random move
-        flag = True
-        while flag:
-            c = random.randrange(0, columns)
-            if state.board[0][c] == 0:
-                # makeMove(s, c)
-                move = c
-                flag = False
-        makeMove(new_state, move)
+        column = random.randrange(0, columns)
+        if state.board[0][column] == 0:
+            makeMove(new_state, column)
     return 1 if value(new_state) == 10**20 else 0  # 1 means the MC agent won, 0 means it lost
 
 
 '''
-Don't forget to delete this later.
-So, I need to remember how Monte Carlo even works.
-First, we select a move.
-Then, we grow a tree from that node.
-Then, we play a game from that node.
-Then, we update our info.
+Okay, so what am I doing wrong? Not only is my algorithm taking too long, it also isn't good enough. Taking too long by
+itself isn't a problem, because I could probably get more efficiency by running the games in parallel. What is a problem
+is that it's not good enough. That I have both problems suggests that they are connected. Or if not, I could make it
+parallel after solving the first problem.
 
-Okay, so, let's start with selection. The slide suggests UCB. So, how do we do that again?
-Except, apparently, we aren't actually using a tree at all. So...
-Instead, whenever we are asked to input a move:
-We randomly pick a move n times. Each time, we play a full random game from that point and record the results.
-Then, we actually pick the move that has the best ratio.
+So, what am I doing wrong? I think I am solving the problem as well as he wants us to. But clearly, I'm not.
 
+Okay, I just found a bug, but solving it seems to have made it worse.
 '''

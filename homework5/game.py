@@ -57,7 +57,7 @@ def value(s):
     val = 0.00001
     for row in range(rows):
         for col in range(columns):
-            for i in range(len(dr)):
+            for i in range(len(dr)):  # basically, range(len(dr)) means range(4) in fancy-speak
                 t = checkSeq(s, row, col, row+dr[i], col+dc[i])
                 if t in [LOSS, VICTORY]:
                     val = t
@@ -176,11 +176,13 @@ def inputMove(s):
 def inputRandom(s):
     # See if the agent can win block one move ahead
     for i in range(0, columns):  # this simple agent always plays min
-        tmp = cpy(s)
-        makeMove(tmp, i)
-        if value(tmp) == LOSS and s.board[0][i] == 0:  # if the agent should win
-            makeMove(s, i)
-            return
+        # if we already have a full column, we shouldn't be looking at it
+        if s.board[0][i] == 0:
+            tmp = cpy(s)
+            makeMove(tmp, i)
+            if value(tmp) == LOSS and s.board[0][i] == 0:  # if the agent should win
+                makeMove(s, i)
+                return
     # If no obvious move, then move random
     flag = True
     while flag:
@@ -195,20 +197,24 @@ def inputHeuristic(s):
     temp = 1000
     tmp_col = 0
     for i in range(0, columns):  # this simple agent always plays min
-        tmp = cpy(s)
-        makeMove(tmp, i)
-        if value(tmp) < temp and s.board[0][i] == 0:  # so a "loss" is a win for this side
-            tmp_col = i
-            temp = value(tmp)
+        # if we already have a full column, we shouldn't be looking at it
+        if s.board[0][i] == 0:
+            tmp = cpy(s)
+            makeMove(tmp, i)
+            if value(tmp) < temp and s.board[0][i] == 0:  # so a "loss" is a win for this side
+                tmp_col = i
+                temp = value(tmp)
     makeMove(s, tmp_col)
 
 
 def inputMC(s):
+    # inputHeuristic(s)
+    # '''
     num_plays = 100
 
     best_move = -1
     best_win_rate = -1
-    for move in range(7):
+    for move in range(columns):
         if s.board[0][move] == 0:
             # No point in investigating the move if it's out of bounds
             num_victories = sum(
@@ -223,20 +229,21 @@ def inputMC(s):
     makeMove(s, best_move)
     # also, print the board, at least for debugging, so I know my progress
     # printState(s)
+    # '''
 
 
 def play_game_from_move(state, move):
     # this function clones the board and plays a game from this move
     new_state = cpy(state)
     makeMove(new_state, move)
-    # I borrowed the rest of the simulation from play
-    # Unfortunately, it isn't very modular (and I can't return from inputMC with a different state), so I need to
-    # simulate the game in here
+
     while not isFinished(new_state):
-        # It doesn't matter whose turn it is, make a random move
+        # It doesn't matter whose turn it is, make a random move until we can't
         column = random.randrange(0, columns)
         if state.board[0][column] == 0:
             makeMove(new_state, column)
+            # If not, try again with a different random value
+            # I determined that keeping track of which rows are open is too expensive
     return 1 if value(new_state) == 10**20 else 0  # 1 means the MC agent won, 0 means it lost
 
 
@@ -248,5 +255,6 @@ parallel after solving the first problem.
 
 So, what am I doing wrong? I think I am solving the problem as well as he wants us to. But clearly, I'm not.
 
-Okay, I just found a bug, but solving it seems to have made it worse.
+Okay, I just found a bug, but solving it seems to have made it worse. I think it's because I restricted it to legal
+moves.
 '''

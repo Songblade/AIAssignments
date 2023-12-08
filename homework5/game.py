@@ -60,8 +60,8 @@ def value(s):
             for i in range(len(dr)):  # basically, range(len(dr)) means range(4) in fancy-speak
                 t = checkSeq(s, row, col, row+dr[i], col+dc[i])
                 if t in [LOSS, VICTORY]:
-                    val = t
-                    break
+                    return t  # Since we have a loss or a victory, we can just return it without any problem with our
+                    # algorithm, which should make this faster
                 else:
                     val += t
     if s.size == 0 and val not in [LOSS, VICTORY]:
@@ -132,7 +132,8 @@ def isFinished(s):
     # I replaced value with a more efficient function that only returns LOSS, VICTORY, TIE, or a placeholder
     # and doesn't act as a heuristic
     # to make my games faster
-    return finish_value(s) in [LOSS, VICTORY, TIE] or s.size == 0
+    return finish_value(s) in [LOSS, VICTORY, TIE]  # I got rid of "or size == 0", because if size == 0, then value
+    # returns TIE
 
 
 # Note: For efficiency, I replaced all equations of constants with their actual values
@@ -152,48 +153,21 @@ def finish_value(s):
                     t = finish_check_seq(s, row, col, row+end_row, col+end_col)
                     if t in [LOSS, VICTORY]:
                         return t
-    if s.size == 0:
-        return TIE
-    return 0.00001
-
-
-'''
-Okay. Let's see if I can't make value more efficient. Right now, we use this every loop, so it's really the most
-important, given that it has triply nested loops inside of it. If I could reduce the length of dr and dc by even 1, it
-would make the program much faster. So, can I do that?
-
-Given any piece in Connect 4, we could check every sequence by checking the sequence to the right, the sequence above,
-and the sequence diagonally. The piece could be in more sequences than that, but if it is, we would be able to find out
-from the beginning of those sequences. But, we are looking at 4 of them. What's the fourth?
-
-Let's see. The first is row -SIZE + 1, column 0. So, row -3, column 0. This is checking for the sequence below (which 
-is really above, because the board is stored upside down).
-
-Next we have row -SIZE + 1, column SIZE-1. Row -3, column 3. So, diagonal up-right.
-
-Wait, I just realized why we need 4 of them. Because there are two diagonals. There is diagonal up-left and up-right. If
-we only check one, we will never check the other. So, we really do need to check all of them.
-
-Hmm. Looking at this, I could probably make a streamlined version for isFinished. When it's used in inputHeuristic, it
-really needs all the stuff. But for isFinished, all we care about is if it's WIN, LOSS, or TIE. So, we can remove all
-code that calculates the heuristic when making a special version for isFinished.
-
-That doesn't seem to have notably improved efficiency. Maybe I just didn't trim enough to make a significant difference.
-'''
+    return TIE if s.size == 0 else 0.00001
 
 
 def finish_check_seq(s, r1, c1, r2, c2):
     # r1, c1 are in the board. if r2,c2 not on board returns 0.
     # Checks the seq. from r1,c1 to r2,c2. If all X returns VICTORY. If all O returns LOSS.
-    # If empty returns 0.00001. If no Os returns 1. If no Xs returns -1.
-    if r2 < 0 or c2 < 0 or r2 >= rows or c2 >= columns:
+    # Otherwise, returns 0.00001.
+    # I got rid of c2 < 0, since it is always >= c1
+    if r2 < 0 or r2 >= rows or c2 >= columns:
         return 0  # r2, c2 are illegal
 
     dr = (r2-r1) // 3  # the horizontal step from cell to cell
     dc = (c2-c1) // 3  # the vertical step from cell to cell
 
     val_sum = 0
-
     for i in range(SIZE):  # summing the values in the seq.
         val_sum += s.board[r1+i*dr][c1+i*dc]
     # I have no idea if this one-line version is more efficient, but it certainly isn't less efficient
@@ -207,12 +181,15 @@ def isHumTurn(s):
     return s.playTurn == HUMAN
 
 
-def decideWhoIsFirst(s):
+def decideWhoIsFirst(s, first="manual"):
     # The user decides who plays first
-    if int(input("Who plays first? 1-MC / anything else-you : ")) == 1:
-        s.playTurn = COMPUTER
+    if first == "manual":
+        if int(input("Who plays first? 1-MC / anything else-you : ")) == 1:
+            s.playTurn = COMPUTER
+        else:
+            s.playTurn = HUMAN
     else:
-        s.playTurn = HUMAN
+        s.playTurn = COMPUTER if first == "computer" else HUMAN
     return s.playTurn
 
 
@@ -226,10 +203,7 @@ def makeMove(s, c):
 
     s.board[r-1][c] = s.playTurn  # marks the board
     s.size -= 1  # one less empty cell
-    if s.playTurn == COMPUTER:
-        s.playTurn = HUMAN
-    else:
-        s.playTurn = COMPUTER
+    s.playTurn = HUMAN if s.playTurn == COMPUTER else COMPUTER  # reducing jumps
 
 
 def inputMove(s):
@@ -414,4 +388,6 @@ heuristic taking so much longer?
 
 Why didn't my old efficiency tool work? Maybe I need to be checking where everything is going. I've just been assuming
 what's taking more time, but I could be wrong. But I really don't want to build such a framework.
+
+Okay. What else could I do to speed up my run? Let's check for caching concerns.
 '''

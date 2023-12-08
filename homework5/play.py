@@ -4,9 +4,10 @@ import time
 
 # opponent is the opponent you are playing, either inputRandom, inputHeuristic, or inputMove
 def run_simulation(opponent_move, first="manual"):
+    print("Running simulation against opponent", opponent_move.__name__)
     board = game.game()
     game.create(board)
-    print("Initial Game")
+    # print("Initial Game")
     # game.printState(board)
     game.decideWhoIsFirst(board, first)
     start_time = time.time()
@@ -14,7 +15,7 @@ def run_simulation(opponent_move, first="manual"):
     for i in range(0, 100):  # This loops takes about 15 seconds on my computer
         while not game.isFinished(board):
             if game.isHumTurn(board):  # The simple agent plays "Human"
-                opponent_move(board)
+                opponent_move(board)  # so that I can input different heuristics as parameters
             else:
                 game.inputMC(board)  # The MC agent plays "Computer"
             # game.printState(board)
@@ -24,7 +25,7 @@ def run_simulation(opponent_move, first="manual"):
         # i + 1)
         game.create(board)
     print("The MC agent beat the baseline:", comp_count, "out of", i + 1)
-    print("Elapsed time is", time.time() - start_time, "when the max is 600")
+    print("Elapsed time is", time.time() - start_time, "seconds")
 
 
 # Against Random: The MC agent beat the baseline: 97  out of  100

@@ -131,7 +131,7 @@ def isFinished(s):
     # returns True iff the game ended
     # I replaced value with a more efficient function that only returns LOSS, VICTORY, TIE, or a placeholder
     # and doesn't act as a heuristic
-    # to make my games faster
+    # to make my games faster, though I'm not sure that it changed anything
     return finish_value(s) in [LOSS, VICTORY, TIE]  # I got rid of "or size == 0", because if size == 0, then value
     # returns TIE
 
@@ -181,6 +181,7 @@ def isHumTurn(s):
     return s.playTurn == HUMAN
 
 
+# I edited this to let me specify who goes first in the code
 def decideWhoIsFirst(s, first="manual"):
     # The user decides who plays first
     if first == "manual":
@@ -253,6 +254,10 @@ def inputHeuristic(s):
     makeMove(s, tmp_col)
 
 
+# If you are wondering, my main efficiency change was in finish_value, where I only run finish_check_seq on a starting
+# position that isn't 0, since it couldn't have a win, loss, or tie
+# But I couldn't make that change for the full version of value, because that would mess up the heuristic
+# But here, we don't care about the heuristic
 def inputMC(s):
     # inputHeuristic(s)
     # '''
@@ -263,9 +268,12 @@ def inputMC(s):
     for move in range(columns):
         if s.board[0][move] == 0:
             # No point in investigating the move if it's out of bounds
+            # We get the number of victories playing 100 games
             num_victories = sum(
                 (play_game_from_move(s, move) for _ in range(num_plays))
             )
+            # no point in calculating win rate
+            # since we play 100 games for every move, we can just compare the raw number of victories
             if num_victories > best_wins:
                 best_wins = num_victories
                 best_move = move
@@ -277,8 +285,8 @@ def inputMC(s):
     # '''
 
 
+# this function clones the board and plays a game from this move
 def play_game_from_move(state, move):
-    # this function clones the board and plays a game from this move
     new_state = cpy(state)
     makeMove(new_state, move)
 
@@ -292,102 +300,4 @@ def play_game_from_move(state, move):
     end_state = finish_value(new_state)
     return 1 if end_state == VICTORY else 0 if end_state == LOSS else 0.5  # 1 means the MC agent won, 0 means it lost
     # 0.5 means it tied, since there is no other possibility
-
-
-'''
-Okay, so what am I doing wrong? Not only is my algorithm taking too long, it also isn't good enough. Taking too long by
-itself isn't a problem, because I could probably get more efficiency by running the games in parallel. What is a problem
-is that it's not good enough. That I have both problems suggests that they are connected. Or if not, I could make it
-parallel after solving the first problem.
-
-So, what am I doing wrong? I think I am solving the problem as well as he wants us to. But clearly, I'm not.
-
-Okay, I just found a bug, but solving it seems to have made it worse. I think it's because I restricted it to legal
-moves.
-
-I fixed it so that the opponents are also restricted to legal moves, and it's all back to normal.
-
-Anyway, it seems that I'm not the only one with problems. So, I'm going to ignore those and focus on how I can make this
-faster.
-
-Okay, so, what can I even fix? Let's start looking at my function only. If that doesn't work, I will try to optimize the
-professor's code.
-
-So, my top loop goes through every column. Since every column is an option, we need to look at all of them. The only 
-time we know that we don't need to look at a column is when it's already full, which we are already doing. So, that's
-not optimizable beyond parallelism.
-
-Next loop: we play the game from that point 100 times. Since we need to play 100 games from that move, that can't really
-be optimized. Meanwhile, calculating the win rate and comparing it to the best one can't really be optimized.
-
-Okay, maybe I can optimize within the games. First, we copy the state. We can't use the old state, so we can't get
-around that. Then, we make the starting move. Then, we have the loop of the game. For as long as we can, we perform
-fully random moves for whichever side we happen to be. If that move is for a full column, we skip it. So, that seems to
-be something perhaps I could optimize. Obviously, I can't let it make false moves. But, is there some other way I could
-keep track of full columns?
-
-I could add a check whenever I make a move to check if it fills a column. If it does, I make a note. I think I would
-have an array with all legal moves. Whenever I fill a column, I remove it. Then, I take a random element of that array
-as the column we go into.
-
-If I'm keeping track of that, I could also make all iterations through the columns go through that array instead, which
-wouldn't save all that much time, but is still interesting.
-
-But would this save time? I would save a number of elements where the move is not available and - oh, this is big. I
-wouldn't have to do the check every time. Except, that's not actually true. Instead of checking whether this move is
-invalid, I would be checking if this move causes a column to be invalidated. So, it's just code motion. My only saving
-is that I would be checking invalid columns. But that doesn't happen that much.
-
-And it's at the cost that whenever I copy the board, I also have to copy this array, an O(n) operation. So, is it worth
-it? Only if the number of bad moves is greater than the time to copy the board. Is it? If it's greater than 7, perhaps.
-But I'm not so sure. Yeah, I don't think this will actually save any time. So, this isn't where I need to make a change.
-
-Either way, I still want to make a change at the base of the loop. Here, even an O(1) improvement would be massive. And
-I only make 2: isFinished and makeMove. So, those are what I need to modify.
-
-Okay. The obvious inefficiency in makeMove is that we have to go through each row to check if that's the right one.
-Would it make more sense to simply keep track of the value of each column? If so, I would have O(n) when copying to copy
-the array, and I would need to increase the value by 1. The latter is O(1), and the former is O(n) every once in a
-while. This is a great fix and I should implement it immediately.
-
-Places to change:
-create() should create this array and initialize it to 7 0s
-cpy() should copy this array as well
-makeMove() should check and update this array
-
-Okay, why isn't my change more efficient? It should be, but it isn't. I've pretty clearly demonstrated that it's no
-better than the alternative. So, how do I fix it?
-
-Also, I have confirmation from Aryeh that it is possible to have a near-perfect run. So I have to figure out what I'm
-doing wrong.
-
-But let's start by examining my change. Maybe I made an error that makes it slower.
-
-Maybe I can fix it by going further?
-
-Hmm. Let's see if I can't boost win-rate with a better heuristic. Let's say that win is 1, loss is 0, and tie is 0.5.
-It still wants the most amount of wins, but now would prefer ties over losses. Since in the end, I only care about
-victories, this might not matter, but I should at least try it.
-
-Okay. I got 87 / 100, which is better than I have gotten before. I suspect I got lucky, and the actual total is below
-this. But it's certainly a fine start. And what Aryeh said implies that I don't actually need to reach the 90s. If I can
-that would be great. But I should focus on reducing from nearly 1000 seconds to 600.
-
-You know what. Let's determine the difference between his heuristics, to see how much each one actually takes. That
-could help determine whether I need to increase mine or his. So, it took 997.6084713935852 seconds to complete my latest
-set for heuristic. For Random, I instead take 
-
-I have decided that calculating this is a waste of time. Maybe I will do it when I am going in and out. Also, I don't
-know how I would interpret the data, since each result is the sum of the data I am looking for with my actual algorithm.
-If I really wanted to, I could also get a third set of data, being my heuristic playing against itself. That would be
-useless for the win rate (probably around 50%), but it would tell me the value of that variable, allowing me to
-calculate the other.
-
-But it looked like it was going to take about 800 seconds, maybe a bit more. So, 200 more seconds is a lot. Why is
-heuristic taking so much longer?
-
-Why didn't my old efficiency tool work? Maybe I need to be checking where everything is going. I've just been assuming
-what's taking more time, but I could be wrong. But I really don't want to build such a framework.
-
-Okay. What else could I do to speed up my run? Let's check for caching concerns.
-'''
+    # I think it leads to a slight increase in win rate, though it might not be statistically significant

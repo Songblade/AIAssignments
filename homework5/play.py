@@ -13,8 +13,8 @@ for i in range(0, 100):  # This loops takes about 15 seconds on my computer
         if game.isHumTurn(board):  # The simple agent plays "Human"
             # NOTE: Whenever you change the opponent here, also change it in the MC simulation
             # game.inputMove(board)
-            # game.inputHeuristic(board)
-            game.inputRandom(board)
+            game.inputHeuristic(board)
+            # game.inputRandom(board)
         else:
             game.inputMC(board)  # The MC agent plays "Computer"
         # game.printState(board)
@@ -26,4 +26,5 @@ print("The MC agent beat the baseline:", comp_count, "out of", i + 1)
 print("Elapsed time is", time.time() - start_time, "when the max is 600")
 
 # Against Random: The MC agent beat the baseline: 99  out of  100
-# Against Heuristic: The MC agent beat the baseline: 83 out of 100
+# Against Heuristic: The MC agent beat the baseline: 87 out of 100
+# Time against Heuristic: 698.7672016620636 seconds

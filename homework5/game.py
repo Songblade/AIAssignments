@@ -144,12 +144,14 @@ def finish_value(s):
     dc = [0, 3, 3, 3]
     for row in range(rows):
         for col in range(columns):
-            for end_row, end_col in zip(dr, dc):
-                # going through dr and dc directly, without checking the index
-                # might not make it better, but won't make it worse
-                t = finish_check_seq(s, row, col, row+end_row, col+end_col)
-                if t in [LOSS, VICTORY]:
-                    return t
+            if s.board[row][col] != 0:
+                # if it equals 0, there's no piece here, so it definitely isn't part of a winning streak
+                for end_row, end_col in zip(dr, dc):
+                    # going through dr and dc directly, without checking the index
+                    # might not make it better, but won't make it worse
+                    t = finish_check_seq(s, row, col, row+end_row, col+end_col)
+                    if t in [LOSS, VICTORY]:
+                        return t
     if s.size == 0:
         return TIE
     return 0.00001

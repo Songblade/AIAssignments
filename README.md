@@ -1,6 +1,7 @@
 # AIAssignments
 This repository contains the assignments from my Artificial Intelligence class.
 
+
 Homework 1 was on graph search and A*.
 
 Homework 2 was on local search.
